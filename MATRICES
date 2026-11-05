@@ -1,0 +1,181 @@
+const NF: usize = 100;
+const NC: usize = 100;
+
+struct Matriz {
+    nro_filas: usize,
+    nro_col: usize,
+    celda: [[u64; NC]; NF],
+}
+
+impl Matriz {
+    // Constructor
+    fn new(nro_filas: usize, nro_col: usize) -> Matriz {
+        Matriz {
+            nro_filas,
+            nro_col,
+            celda: [[0; NC]; NF],
+        }
+    }
+
+    fn obt_nrofilas(&self) -> usize {
+        self.nro_filas
+    }
+
+    fn obt_nrocol(&self) -> usize {
+        self.nro_col
+    }
+
+    fn get_celda(&self, f: usize, c: usize) -> u64 {
+        self.celda[f][c]
+    }
+
+    fn set_celda(&mut self, f: usize, c: usize, valor: u64) {
+        self.celda[f][c] = valor;
+    }
+
+    // Suma todos los elementos de la matriz.
+    fn suma(&self) -> u64 {
+        let mut suma: u64 = 0;
+        for i in 0..self.nro_filas {
+            for j in 0..self.nro_col {
+                suma += self.celda[i][j];
+            }
+        }
+        suma
+    }
+
+    // Cuenta los números pares de la matriz.
+    fn cant_pares(&self) -> u64 {
+        let mut pares: u64 = 0;
+        for i in 0..self.nro_filas {
+            for j in 0..self.nro_col {
+                if self.celda[i][j] % 2 == 0 {
+                    pares += 1;
+                }
+            }
+        }
+        pares
+    }
+
+    // Cuenta los números impares (total de celdas - pares).
+    fn impar(&self) -> u64 {
+        (self.nro_filas * self.nro_col) as u64 - self.cant_pares()
+    }
+
+    // Promedio de todos los elementos.
+    fn promedio(&self) -> f64 {
+        let total = (self.nro_filas * self.nro_col) as f64;
+        if total == 0.0 {
+            return 0.0;
+        }
+        self.suma() as f64 / total
+    }
+
+    // Suma de una fila (f se cuenta desde 1: fila 1 = primera fila).
+    fn sumarfila(&self, f: usize) -> u64 {
+        if f == 0 || f > self.nro_filas {
+            return 0;
+        }
+        let fila = f - 1;
+        let mut suma: u64 = 0;
+        for j in 0..self.nro_col {
+            suma += self.celda[fila][j];
+        }
+        suma
+    }
+
+    // Diagonal principal (solo matrices cuadradas).
+    fn sumadiagonalp(&self) -> u64 {
+        if self.nro_filas != self.nro_col {
+            return 0;
+        }
+        let mut suma: u64 = 0;
+        for i in 0..self.nro_col {
+            suma += self.celda[i][i];
+        }
+        suma
+    }
+
+    // Diagonal secundaria (solo matrices cuadradas).
+    fn sumadiagonals(&self) -> u64 {
+        if self.nro_filas != self.nro_col {
+            return 0;
+        }
+        let mut suma: u64 = 0;
+        for i in 0..self.nro_filas {
+            let j = self.nro_col - 1 - i;
+            suma += self.celda[i][j];
+        }
+        suma
+    }
+
+    // Ordena toda la matriz de menor a mayor, recorriendo fila por fila.
+    fn ordenar(&mut self) {
+        let n = self.nro_filas * self.nro_col;
+        for p in 0..n {
+            for q in (p + 1)..n {
+                let (i, j) = (p / self.nro_col, p % self.nro_col);
+                let (k, l) = (q / self.nro_col, q % self.nro_col);
+                if self.celda[k][l] < self.celda[i][j] {
+                    let temp = self.celda[i][j];
+                    self.celda[i][j] = self.celda[k][l];
+                    self.celda[k][l] = temp;
+                }
+            }
+        }
+    }
+
+    fn mostrar(&self) {
+        println!();
+        for i in 0..self.nro_filas {
+            println!(" ");
+            for _ in 0..self.nro_col {
+                print!("┌─────────┐");
+            }
+            println!();
+            print!("  ");
+            for c in 0..self.nro_col {
+                print!("│{:^9}│", self.celda[i][c]);
+            }
+            println!();
+            print!("  ");
+            for _ in 0..self.nro_col {
+                print!("└─────────┘");
+            }
+            println!();
+        }
+        print!("  ");
+        for c in 0..self.nro_col {
+            print!("{:^11}", format!("c{}", c));
+        }
+        println!("\n");
+    }
+}
+
+fn main() {
+    println!("════════════════════════════════════════");
+    println!("  Matrices - POO — Programación I      ");
+    println!("════════════════════════════════════════");
+
+    let mut m = Matriz::new(3, 3);
+
+    m.celda[0][0] = 1;  m.celda[0][1] = 2;  m.celda[0][2] = 3;
+    m.celda[1][0] = 14; m.celda[1][1] = 5;  m.celda[1][2] = 6;
+    m.celda[2][0] = 7;  m.celda[2][1] = 8;  m.celda[2][2] = 9;
+
+    println!("Matriz original:");
+    m.mostrar();
+    println!("════════════════════════════════════════");
+    println!("La suma de todos los valores es: {}", m.suma());
+    println!("La cantidad de pares es: {}", m.cant_pares());
+    println!("La cantidad de impares es: {}", m.impar());
+    println!("El promedio es: {:.2}", m.promedio());
+    println!("Suma de la fila 2: {}", m.sumarfila(2));
+    println!("Suma de la diagonal principal: {}", m.sumadiagonalp());
+    println!("Suma de la diagonal secundaria: {}", m.sumadiagonals());
+
+    m.ordenar();
+    println!("════════════════════════════════════════");
+    println!("Matriz ordenada:");
+    m.mostrar();
+}
